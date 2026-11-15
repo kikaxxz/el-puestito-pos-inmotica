@@ -24,4 +24,4 @@ El APK aparece en build/app/outputs/flutter-apk/app-release.apk.
 
 El QR lleva la direccion local del servidor y la clave que el cliente envia por la cabecera X-API-KEY. Los QR anteriores, que solo contenian una URL, ya no bastan: vuelve a generarlo desde el POS. El telefono y la computadora deben estar en la misma red, y el firewall de Windows debe permitir el puerto TCP 5000.
 
-El backend activo esta en POS/server/; lib/server.py es un script heredado que no usa la app Flutter.
+El backend activo esta en POS/server/; lib/server.py es un script heredado que no usa la app Flutter. Si la app recibe HTML en /employees, el puerto 5000 esta sirviendo otro proceso o una version antigua del servidor: inicia el POS actualizado y escanea su QR.

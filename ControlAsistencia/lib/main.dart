@@ -222,6 +222,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
       if (!mounted) return;
 
+      final contentType = response.headers['content-type']?.toLowerCase() ?? '';
+      if (!contentType.contains('application/json')) {
+        setState(() {
+          _statusMessage =
+              'El servidor respondio HTTP ${response.statusCode} con HTML en /employees. Abre el POS actualizado, confirma que el telefono esta en la misma red y vuelve a escanear su QR.';
+          _employees = [];
+        });
+        return;
+      }
+
       if (response.statusCode == 200) {
         final List<dynamic> employeeListJson = jsonDecode(response.body);
         setState(() {
@@ -238,10 +248,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           _employees = [];
         });
       }
+    } on FormatException {
+      if (!mounted) return;
+      setState(() {
+        _statusMessage =
+            'El servidor devolvio datos invalidos en /employees. Reinicia el POS actualizado y vuelve a escanear su QR.';
+        _employees = [];
+      });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _statusMessage = 'Error de red al cargar empleados: ${e.toString()}';
+        _statusMessage = 'No se pudo conectar al servidor: ${e.toString()}';
         _employees = [];
       });
     }
@@ -384,6 +401,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           )
           .timeout(const Duration(seconds: 10));
 
+      final contentType = response.headers['content-type']?.toLowerCase() ?? '';
+      if (!contentType.contains('application/json')) {
+        setState(() {
+          _statusMessage =
+              'El servidor respondio sin JSON en /registrar. Reinicia el POS actualizado y vuelve a escanear su QR.';
+        });
+        return;
+      }
       final responseBody = jsonDecode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
