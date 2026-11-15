@@ -1,0 +1,50 @@
+{
+  "meshes": [
+    {
+      "source": "Instrumento_2122",
+      "replacement": "Instrumento_2122_AccesoCorregido",
+      "vertices_moved": 24
+    },
+    {
+      "source": "Instrumento_2132",
+      "replacement": "Instrumento_2132_AccesoCorregido",
+      "vertices_moved": 2152
+    },
+    {
+      "source": "Instrumento_2152",
+      "replacement": "Instrumento_2152_AccesoCorregido",
+      "vertices_moved": 24
+    },
+    {
+      "source": "Instrumento_2162",
+      "replacement": "Instrumento_2162_AccesoCorregido",
+      "vertices_moved": 7489
+    },
+    {
+      "source": "Instrumento_2172",
+      "replacement": "Instrumento_2172_AccesoCorregido",
+      "vertices_moved": 488
+    },
+    {
+      "source": "Puerta_2202",
+      "replacement": "Puerta_2202_AccesoCorregido",
+      "vertices_moved": 1104
+    },
+    {
+      "source": "Puerta_2212",
+      "replacement": "Puerta_2212_AccesoCorregido",
+      "vertices_moved": 23547
+    }
+  ],
+  "cylinder_shift_m": [
+    -2.72,
+    -0.23608371609246498,
+    -1.1
+  ],
+  "floor_y_m": 0.1203583987375521,
+  "cylinder_center_xz_m": [
+    0.4,
+    32.25
+  ],
+  "cubicle_opening": "outward"
+}

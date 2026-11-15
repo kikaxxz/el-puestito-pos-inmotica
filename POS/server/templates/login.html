@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso KDS</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <img src="/images/Logo.png" alt="El Puestito" class="brand-logo" onerror="this.style.display='none'">
+            <div class="login-title">Ingresa tu PIN de Acceso</div>
+            
+            <div class="pin-dots" id="pinDots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+
+            <div class="numpad">
+                <button class="num-btn" onclick="typePin(1)">1</button>
+                <button class="num-btn" onclick="typePin(2)">2</button>
+                <button class="num-btn" onclick="typePin(3)">3</button>
+                <button class="num-btn" onclick="typePin(4)">4</button>
+                <button class="num-btn" onclick="typePin(5)">5</button>
+                <button class="num-btn" onclick="typePin(6)">6</button>
+                <button class="num-btn" onclick="typePin(7)">7</button>
+                <button class="num-btn" onclick="typePin(8)">8</button>
+                <button class="num-btn" onclick="typePin(9)">9</button>
+                <button class="num-btn clear" onclick="clearPin()">✕</button>
+                <button class="num-btn" onclick="typePin(0)">0</button>
+                <button class="num-btn enter" onclick="submitPin()">➜</button>
+            </div>
+            <div id="loginError" style="color: #ff4444; margin-top: 15px; font-size: 14px; min-height: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        let pin = "";
+        const errorDisplay = document.getElementById('loginError');
+        
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index < pin.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+        }
+
+        function typePin(num) {
+            errorDisplay.textContent = ""; 
+            if (pin.length < 4) {
+                pin += num;
+                updateDots();
+                if (pin.length === 4) submitPin(); 
+            }
+        }
+
+        function clearPin() {
+            pin = "";
+            updateDots();
+        }
+
+        function showErrorAnimation(message) {
+            errorDisplay.textContent = message;
+            document.querySelector('.login-card').animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(-10px)' },
+                { transform: 'translateX(10px)' },
+                { transform: 'translateX(0)' }
+            ], { duration: 300 });
+            clearPin();
+        }
+
+        async function submitPin() {
+            if (pin.length !== 4) return;
+            
+            errorDisplay.textContent = "Verificando...";
+            
+            try {
+                const res = await fetch('/api/validar-pin', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({pin: pin})
+                });
+                
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.message || "Error de servidor");
+                }
+
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    window.location.href = data.redirect;
+                } else {
+                    showErrorAnimation(data.message || "PIN Incorrecto");
+                }
+            } catch (e) {
+                console.error(e);
+                showErrorAnimation(e.message || "Error de conexión");
+            }
+        }
+    </script>
+</body>
+</html>

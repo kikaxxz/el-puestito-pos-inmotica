@@ -1,0 +1,90 @@
+{
+  "doors": [
+    {
+      "hinge": [
+        8.53170394897461,
+        0.0187887623906136,
+        14.531343460083
+      ],
+      "open_angle": 1.5707963267949,
+      "source": "Sketchfab_Scene3",
+      "open_yaw": 90
+    },
+    {
+      "hinge": [
+        8.52229309082031,
+        0.0425473973155022,
+        15.804669380188
+      ],
+      "open_angle": 1.5707963267949,
+      "source": "Sketchfab_Scene5",
+      "open_yaw": 90
+    },
+    {
+      "hinge": [
+        8.52553176879883,
+        0.0555815994739532,
+        16.9512176513672
+      ],
+      "open_angle": 1.5707963267949,
+      "source": "Sketchfab_Scene6",
+      "open_yaw": 90
+    },
+    {
+      "hinge": [
+        6.64629125595093,
+        0.0060892291367054,
+        14.8408613204956
+      ],
+      "open_angle": 1.5707963267949,
+      "source": "Sketchfab_Scene9",
+      "open_yaw": -90.0000000000002
+    },
+    {
+      "hinge": [
+        6.61391401290894,
+        0.00656174123287201,
+        15.812352180481
+      ],
+      "open_angle": 1.5707963267949,
+      "source": "Sketchfab_Scene10",
+      "open_yaw": -90.0000000000002
+    },
+    {
+      "hinge": [
+        0.123959004878998,
+        0.0520415529608727,
+        17.7538280487061
+      ],
+      "open_angle": 1.5707963267949,
+      "source": "Sketchfab_Scene15",
+      "open_yaw": -90.0000000000002
+    },
+    {
+      "hinge": [
+        2.69868731498718,
+        0.0545581802725792,
+        30.7960605621338
+      ],
+      "open_angle": -1.5707963267949,
+      "source": "Sketchfab_Scene17",
+      "open_yaw": 90.0000000000002
+    }
+  ],
+  "triangles": {
+    "PuertaInteractiva_0_Hoja": 226,
+    "PuertaInteractiva_1_Hoja": 226,
+    "PuertaInteractiva_2_Hoja": 226,
+    "PuertaInteractiva_3_Hoja": 226,
+    "PuertaInteractiva_4_Hoja": 226,
+    "PuertaInteractiva_5_Hoja": 226,
+    "PuertaInteractiva_6_Hoja": 226,
+    "PuertaInteractiva_0_Manilla": 3621,
+    "PuertaInteractiva_1_Manilla": 3620,
+    "PuertaInteractiva_2_Manilla": 3652,
+    "PuertaInteractiva_3_Manilla": 3338,
+    "PuertaInteractiva_4_Manilla": 3582,
+    "PuertaInteractiva_5_Manilla": 3611,
+    "PuertaInteractiva_6_Manilla": 3624
+  }
+}

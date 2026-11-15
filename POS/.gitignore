@@ -1,0 +1,72 @@
+# =======================================================
+# GitIgnore - El Puestito Desktop
+# =======================================================
+
+# --- PyInstaller y Compilaciones ---
+build/
+dist/
+bin/
+obj/
+*.pyz
+*.pyd
+
+# Preservar archivo de especificación de PyInstaller y DLLs de hardware necesarias
+!*.spec
+!libusb-1.0.dll
+
+# --- Python / Entornos / Caché ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.log
+logs/
+pytest_output.log
+pytest_*.log
+ERROR_CRITICO.txt
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+ENV/
+
+# --- Secretos y Credenciales ---
+firebase_credentials.json
+*.key
+secret.key
+.env
+*.env
+
+# --- Base de Datos Local y SQLite Runtime ---
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+Assets/puestito.db
+Assets/puestito.db-shm
+Assets/puestito.db-wal
+
+# --- Documentación, Diagramas y Reportes No-Código ---
+*.mmd
+*.pdf
+
+# --- Carpetas Temporales, Benchmarks y Salidas ---
+tmp/
+output/
+evaluation/iso25010_20260728/
+
+# --- IDEs, Editores y Herramientas ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.VSCodeCounter/
+*.VSCodeCounter
+.agents/
+.codex/

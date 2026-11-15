@@ -1,0 +1,27 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Architecture",
+  "Description": "Restaurante El Puestito: recorrido y simulacion inmotica local",
+  "Plugins": [
+    {
+      "Name": "PythonScriptPlugin",
+      "Enabled": true
+    },
+    {
+      "Name": "EditorScriptingUtilities",
+      "Enabled": true
+    },
+    {
+      "Name": "Interchange",
+      "Enabled": true
+    }
+  ],
+  "Modules": [
+    {
+      "Name": "ElPuestito",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
