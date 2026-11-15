@@ -4,7 +4,8 @@ Repositorio de **código fuente y recursos editables** para ejecutar la demostra
 
 ## Contenido
 
-- `POS/`: aplicación Python/PyQt, base de datos que se crea al iniciar, dashboard inmótico, pruebas y datos sintéticos de demostración.
+- `POS/`: aplicación Python/PyQt, base de datos que se crea al iniciar, dashboard inmótico, pruebas y datos sintéticos de demostración. Incluye el QR con autenticación para la app móvil.
+- `ControlAsistencia/`: app Flutter Android para seleccionar empleados y registrar asistencia contra el POS.
 - `Unreal/ElPuestitoPiloto/`: proyecto Unreal Engine 5.8, escena nocturna, recursos, módulo C++ Modbus y puertas interactivas.
 - Los archivos `.uasset`, `.umap` y `.glb` se distribuyen con **Git LFS**. Instala Git LFS antes de clonar; de lo contrario solo se descargarán punteros de los recursos pesados.
 
@@ -22,4 +23,4 @@ Para conectar el POS, mantén ambos programas en el mismo equipo y abre la pesta
 
 El repositorio usa PIN y clave API locales de demostración. No contiene las credenciales Firebase originales, bases de datos, registros de ventas o asistencia, ni paquetes `.exe`. Los datos de uso se guardan fuera del repositorio, bajo `%APPDATA%`.
 
-Consulta `POS/README.md` y `Unreal/ElPuestitoPiloto/README.md` para pasos detallados.
+Consulta `POS/README.md`, `ControlAsistencia/README.md` y `Unreal/ElPuestitoPiloto/README.md` para pasos detallados.

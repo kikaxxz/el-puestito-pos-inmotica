@@ -2,6 +2,7 @@ import os
 import io
 import socket
 import qrcode
+from urllib.parse import urlencode
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
@@ -56,9 +57,13 @@ class QRCodeDialog(QDialog):
     def generate_and_display_qr(self):
         ip_address = self.get_local_ip()
         server_url = f"http://{ip_address}:5000"
-        
-        logger.info(f"Generando QR para la dirección: {server_url}")
-        qr_image = qrcode.make(server_url)
+        app_controller = getattr(self.parent(), "app_controller", None)
+        api_key = getattr(app_controller, "API_KEY", "")
+        qr_payload = f"{server_url}?{urlencode({'api_key': api_key})}"
+
+        # La app extrae la clave del QR y la envía en X-API-KEY.
+        logger.info(f"Generando QR de asistencia para: {server_url}")
+        qr_image = qrcode.make(qr_payload)
         
         buffer = io.BytesIO()
         qr_image.save(buffer, "PNG")
