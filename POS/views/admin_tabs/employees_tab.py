@@ -241,7 +241,7 @@ class EmployeesTab(QWidget):
             self,
             "Desvincular dispositivo",
             f"¿Desvincular el teléfono asociado a {name}?\n\n"
-            "El empleado podrá registrar su cuenta desde un teléfono nuevo.",
+            "El primer teléfono que registre asistencia con esta cuenta quedará asociado. Hazlo cuando el empleado tenga el teléfono nuevo a mano.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
@@ -253,7 +253,7 @@ class EmployeesTab(QWidget):
             QMessageBox.information(
                 self,
                 "Dispositivo desvinculado",
-                "La vinculación se eliminó. El empleado puede iniciar sesión desde su nuevo teléfono.",
+                "Vinculación eliminada. El teléfono usado en el próximo registro quedará asociado a esta cuenta.",
             )
         else:
             QMessageBox.critical(
