@@ -1,4 +1,5 @@
 import datetime
+import json
 import csv
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
@@ -6,6 +7,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSlot
 from logger_setup import setup_logger
+from path_manager import get_persistent_path
 
 logger = setup_logger()
 
@@ -187,43 +189,148 @@ class AttendancePage(QWidget):
         except Exception as e:
             logger.error(f"Error al registrar asistencia en la vista: {e}")
 
+    def _get_admin_pin(self):
+        config = {}
+        try:
+            config_path = get_persistent_path("config.json")
+            with open(config_path, "r", encoding="utf-8") as config_file:
+                config = json.load(config_file)
+        except Exception as e:
+            logger.warning(f"No se pudo leer la configuración actual para validar el PIN: {e}")
+            config = getattr(self.app_controller, "config", {}) or {}
+
+        seguridad = config.get("seguridad", {}) if isinstance(config, dict) else {}
+        pines = seguridad.get("pines_acceso") or seguridad.get("pines") or {}
+        if not isinstance(pines, dict):
+            return ""
+
+        for rol, pin in pines.items():
+            rol_normalizado = str(rol).strip().casefold().replace("_", "").replace(" ", "")
+            if rol_normalizado in ("admin", "administrador", "administrator"):
+                return str(pin or "").strip()
+        return ""
+
     def limpiar_registros(self):
-        texto_advertencia = ("¿Esta seguro de que desea limpiar todos los registros?\n\n"
-                            "Esto borrara PERMANENTEMENTE todo el historial de asistencia de la base de datos.\n\n"
-                            "¡Esta accion no se puede deshacer!")
-        
-        confirm = QMessageBox.question(self, 
-                                    "Confirmar Limpieza TOTAL", 
-                                    texto_advertencia,
-                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
-                                    QMessageBox.StandardButton.No)
-        
-        if confirm == QMessageBox.StandardButton.No:
+        empleados = self.app_controller.get_todos_los_empleados() or []
+        opciones = ["Todo el historial", "Historial de un empleado"]
+        alcance, ok = QInputDialog.getItem(
+            self,
+            "Limpiar historial de asistencia",
+            "¿Qué historial quieres eliminar?",
+            opciones,
+            0,
+            False,
+        )
+        if not ok:
             return
 
-        pin, ok = QInputDialog.getText(self, "PIN de Administrador", "Ingrese el PIN de administrador para continuar:", QLineEdit.EchoMode.Password)
+        empleado_seleccionado = None
+        if alcance == "Historial de un empleado":
+            if not empleados:
+                QMessageBox.information(self, "Sin empleados", "No hay empleados registrados.")
+                return
+            etiquetas = [
+                f"{empleado.get('nombre', 'Sin nombre')} — {empleado.get('id_empleado', '')}"
+                for empleado in empleados
+            ]
+            etiqueta, ok = QInputDialog.getItem(
+                self,
+                "Seleccionar empleado",
+                "Elige el empleado cuyo historial quieres eliminar:",
+                etiquetas,
+                0,
+                False,
+            )
+            if not ok:
+                return
+            empleado_seleccionado = empleados[etiquetas.index(etiqueta)]
+
+        if empleado_seleccionado:
+            nombre = empleado_seleccionado.get("nombre", "empleado")
+            employee_id = empleado_seleccionado.get("id_empleado")
+            titulo = "Confirmar limpieza del empleado"
+            advertencia = (
+                f"¿Eliminar todo el historial de asistencia de {nombre}?"
+                + chr(10) * 2
+                + "Los registros borrados ya no aparecerán en los reportes ni en los cálculos de nómina. "
+                "Esta acción no se puede deshacer."
+            )
+        else:
+            employee_id = None
+            titulo = "Confirmar limpieza total"
+            advertencia = (
+                "¿Eliminar el historial de asistencia de todos los empleados?"
+                + chr(10) * 2
+                + "Los registros borrados ya no aparecerán en los reportes ni en los cálculos de nómina. "
+                "Esta acción no se puede deshacer."
+            )
+
+        confirm = QMessageBox.question(
+            self,
+            titulo,
+            advertencia,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if confirm != QMessageBox.StandardButton.Yes:
+            return
+
+        admin_pin_str = self._get_admin_pin()
+        if not admin_pin_str:
+            QMessageBox.critical(
+                self,
+                "PIN no configurado",
+                "No se encontró el PIN de Administrador. Revisa la configuración de seguridad del POS.",
+            )
+            return
+
+        pin, ok = QInputDialog.getText(
+            self,
+            "PIN de Administrador",
+            "Ingresa el PIN de Administrador para continuar:",
+            QLineEdit.EchoMode.Password,
+        )
         if not ok or not pin:
             return
-
-        admin_pin_str = str(self.app_controller.config.get('seguridad', {}).get('pines_acceso', {}).get('Admin', '')).strip()
-        
-        if str(pin).strip() != admin_pin_str or not admin_pin_str:
-            QMessageBox.critical(self, "Acceso Denegado", "PIN incorrecto. Operacion cancelada.")
-            logger.warning("Intento fallido de limpiar registros de asistencia: PIN incorrecto.")
+        if str(pin).strip() != admin_pin_str:
+            QMessageBox.critical(
+                self,
+                "Acceso denegado",
+                "El PIN no coincide. No se eliminó ningún registro.",
+            )
+            logger.warning("Intento fallido de limpiar historial de asistencia.")
             return
 
-        logger.info("Limpiando TODO el historial de la base de datos...")
-        
         try:
-            if confirm == QMessageBox.StandardButton.Yes:
-                from src.database.repositories.attendance import attendance_repo
-                attendance_repo.clear_all_attendance_history()
-                self.load_and_refresh_table()
-                logger.info("Registros de historial limpiados. Tabla de asistencia reseteada.")
-                QMessageBox.information(self,"Limpieza Completa", "Se ha borrado todo el historial de asistencia.")
+            from src.database.repositories.attendance import attendance_repo
+            if employee_id is None:
+                deleted_count = attendance_repo.clear_all_attendance_history()
+                descripcion = "el historial de todos los empleados"
+            else:
+                deleted_count = attendance_repo.clear_employee_attendance_history(employee_id)
+                descripcion = f"el historial de {empleado_seleccionado.get('nombre', 'el empleado')}"
+
+            self.load_and_refresh_table()
+            if deleted_count:
+                QMessageBox.information(
+                    self,
+                    "Historial eliminado",
+                    f"Se eliminaron {deleted_count} registros de {descripcion}.",
+                )
+            else:
+                QMessageBox.information(
+                    self,
+                    "Sin registros",
+                    "No había registros de asistencia para eliminar en la selección.",
+                )
+            logger.info(f"Limpieza completada: {deleted_count} registros de {descripcion}.")
         except Exception as e:
             logger.error(f"Error al limpiar los registros de asistencia: {e}")
-            QMessageBox.critical(self, "Error", "No se pudo limpiar el historial de asistencia.")
+            QMessageBox.critical(
+                self,
+                "Error",
+                "No se pudo limpiar el historial de asistencia. No se cambió la configuración de empleados.",
+            )
 
     def exportar_csv(self):
         try:

@@ -21,6 +21,12 @@ class AttendanceRepository:
     def clear_all_attendance_history(self):
         return db_manager.execute("DELETE FROM eventos_asistencia;")
 
+    def clear_employee_attendance_history(self, employee_id):
+        return db_manager.execute(
+            "DELETE FROM eventos_asistencia WHERE id_empleado = ?;",
+            (employee_id,)
+        )
+
     def get_last_attendance_event(self, employee_id):
         return db_manager.fetchone("SELECT tipo, timestamp FROM eventos_asistencia WHERE id_empleado = ? ORDER BY timestamp DESC LIMIT 1;", (employee_id,))
 
