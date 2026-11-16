@@ -67,7 +67,7 @@ def registrar_asistencia():
             print(f"Error: Dispositivo {device_id} ya registrado por {emp.get('nombre')}.")
             return jsonify({
                 "error": "device_taken",
-                "message": f"Este dispositivo ya está registrado a nombre de: {emp.get('nombre')}. Contacte al administrador."
+                "message": "Este teléfono ya está vinculado a otra cuenta. Contacta al administrador para actualizar la vinculación."
             }), 403 # 403 Forbidden (Prohibido)
 
         if emp.get("id") == employee_id:

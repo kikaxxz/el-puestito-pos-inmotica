@@ -353,6 +353,22 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
+  String _friendlyAttendanceError(Map<String, dynamic> responseBody) {
+    switch (responseBody['error']) {
+      case 'device_taken':
+        return 'Este teléfono ya está vinculado a otra cuenta. Contacta al administrador para actualizar la vinculación.';
+      case 'device_mismatch':
+        return 'Tu cuenta ya está vinculada a otro teléfono. Contacta al administrador para actualizar la vinculación.';
+      case 'not_found':
+        return 'No encontramos ese usuario. Actualiza la lista e inténtalo de nuevo.';
+      case 'invalid_request':
+        return 'No se recibieron los datos necesarios. Cierra la app, vuelve a abrirla e inténtalo de nuevo.';
+    }
+    final message = responseBody['message'];
+    if (message is String && message.trim().isNotEmpty) return message;
+    return 'No se pudo registrar la asistencia. Inténtalo de nuevo o contacta al administrador.';
+  }
+
   Future<void> _sendAttendanceData() async {
     final serverUrl = _savedServerUrl;
 
@@ -418,7 +434,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       } else {
         setState(() {
           _statusMessage =
-              'Error: ${responseBody['message'] ?? 'Error desconocido del servidor.'}';
+              'No se pudo registrar: ${_friendlyAttendanceError(Map<String, dynamic>.from(responseBody))}';
         });
       }
     } catch (e) {
