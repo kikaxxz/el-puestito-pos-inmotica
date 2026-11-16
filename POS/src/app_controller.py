@@ -52,7 +52,7 @@ class AppController(QObject):
         logger.info(f"Multithreading con un maximo de {self.threadpool.maxThreadCount()} hilos")
         
         self.config = self._load_config()
-        self.API_KEY = self.config.get("api_key", "DEMO-LOCAL-EL-PUESTITO-2026")
+        self.API_KEY = self.config.get("api_key", "puestito_seguro_2025")
         self.SERVER_URL = self.config.get("server_url", "http://127.0.0.1:5000")
         self.printer_service = PrinterService(self)
         self.notification_service = notification_service
@@ -105,6 +105,18 @@ class AppController(QObject):
             self.error_ocurrido.emit(f"Error eliminando empleado: {e}")
             return False
     
+    def desvincular_dispositivo_empleado(self, employee_id):
+        try:
+            result = self.employee_repo.unlink_device_from_employee(employee_id)
+            if result:
+                self.lista_empleados_actualizada.emit()
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error desvinculando dispositivo del empleado: {e}")
+            self.error_ocurrido.emit("No se pudo desvincular el dispositivo.")
+            return False
+
     def save_config_to_file(self, config_data):
         import json
         import os

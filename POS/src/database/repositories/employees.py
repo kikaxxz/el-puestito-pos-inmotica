@@ -36,6 +36,12 @@ class EmployeeRepository:
     def link_device_to_employee(self, employee_id, device_id):
         return db_manager.execute("UPDATE empleados SET deviceId = ? WHERE id_empleado = ?;", (device_id, employee_id))
 
+    def unlink_device_from_employee(self, employee_id):
+        return db_manager.execute(
+            "UPDATE empleados SET deviceId = NULL WHERE id_empleado = ?;",
+            (employee_id,)
+        )
+
     def link_fingerprint_to_employee(self, employee_id, fingerprint_id):
         try:
             db_manager.execute("UPDATE empleados SET fingerprint_id = NULL WHERE fingerprint_id = ?", (fingerprint_id,))

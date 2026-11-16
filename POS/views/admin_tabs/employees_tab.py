@@ -145,7 +145,11 @@ class EmployeesTab(QWidget):
         
         self.btn_delete = QPushButton("Eliminar Empleado")
         self.btn_delete.setStyleSheet("background-color: #c62828; color: white; padding: 8px; border-radius: 4px; font-weight: bold;")
-        
+
+        self.btn_unlink_device = QPushButton("Desvincular dispositivo")
+        self.btn_unlink_device.setStyleSheet("background-color: #ef6c00; color: white; padding: 8px; border-radius: 4px; font-weight: bold;")
+        self.btn_unlink_device.setEnabled(False)
+
         self.btn_format_sensor = QPushButton("Formatear Sensor")
         self.btn_format_sensor.setStyleSheet("background-color: #b71c1c; color: white; font-weight: bold; padding: 8px; border-radius: 4px;")
         self.btn_format_sensor.setFixedWidth(150)
@@ -153,19 +157,24 @@ class EmployeesTab(QWidget):
         controls_layout.addWidget(self.btn_add)
         controls_layout.addWidget(self.btn_edit)
         controls_layout.addWidget(self.btn_delete)
+        controls_layout.addWidget(self.btn_unlink_device)
         controls_layout.addStretch()
         controls_layout.addWidget(self.btn_format_sensor)
         layout.addLayout(controls_layout)
 
         self.employee_table = QTableWidget()
-        self.employee_table.setColumnCount(3) 
-        self.employee_table.setHorizontalHeaderLabels(["ID", "Nombre Completo", "Rol"]) 
+        self.employee_table.setColumnCount(4) 
+        self.employee_table.setHorizontalHeaderLabels(["ID", "Nombre Completo", "Rol", "Dispositivo"]) 
         header = self.employee_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
         self.employee_table.setColumnWidth(0, 150)
-        self.employee_table.setColumnWidth(2, 200)
+        self.employee_table.setColumnWidth(2, 160)
+        self.employee_table.setColumnWidth(3, 145)
+        self.employee_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.employee_table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         
         self.employee_table.setAlternatingRowColors(True)
         self.employee_table.setShowGrid(False)
@@ -179,6 +188,8 @@ class EmployeesTab(QWidget):
         self.btn_add.clicked.connect(self.add_employee)
         self.btn_edit.clicked.connect(self.edit_employee)
         self.btn_delete.clicked.connect(self.delete_employee)
+        self.btn_unlink_device.clicked.connect(self.unlink_employee_device)
+        self.employee_table.itemSelectionChanged.connect(self._update_unlink_button)
         self.btn_format_sensor.clicked.connect(self.formatear_sensor)
 
     def refresh_employee_table(self):
@@ -189,14 +200,67 @@ class EmployeesTab(QWidget):
             id_item = QTableWidgetItem(employee.get("id_empleado"))
             name_item = QTableWidgetItem(employee.get("nombre"))
             rol_item = QTableWidgetItem(employee.get("rol", "No asignado"))
-            
-            id_item.setFlags(id_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            name_item.setFlags(name_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            rol_item.setFlags(rol_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            device_status = "Vinculado" if employee.get("deviceId") else "Sin vincular"
+            device_item = QTableWidgetItem(device_status)
+
+            for item in (id_item, name_item, rol_item, device_item):
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
 
             self.employee_table.setItem(row, 0, id_item)
             self.employee_table.setItem(row, 1, name_item)
             self.employee_table.setItem(row, 2, rol_item)
+            self.employee_table.setItem(row, 3, device_item)
+        self.employee_table.clearSelection()
+        self._update_unlink_button()
+
+    def _selected_employee(self):
+        selected_rows = self.employee_table.selectionModel().selectedRows()
+        if not selected_rows:
+            return None
+        row = selected_rows[0].row()
+        if row < 0 or row >= len(self.employees_data):
+            return None
+        return self.employees_data[row]
+
+    def _update_unlink_button(self):
+        employee = self._selected_employee()
+        self.btn_unlink_device.setEnabled(bool(employee and employee.get("deviceId")))
+
+    def unlink_employee_device(self):
+        employee = self._selected_employee()
+        if not employee:
+            QMessageBox.warning(self, "Selección", "Selecciona un empleado.")
+            return
+        if not employee.get("deviceId"):
+            QMessageBox.information(self, "Sin dispositivo", "Este empleado no tiene un teléfono vinculado.")
+            self._update_unlink_button()
+            return
+
+        name = employee.get("nombre", "este empleado")
+        confirm = QMessageBox.question(
+            self,
+            "Desvincular dispositivo",
+            f"¿Desvincular el teléfono asociado a {name}?\n\n"
+            "El empleado podrá registrar su cuenta desde un teléfono nuevo.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if confirm != QMessageBox.StandardButton.Yes:
+            return
+
+        if self.app_controller.desvincular_dispositivo_empleado(employee.get("id_empleado")):
+            self.refresh_employee_table()
+            QMessageBox.information(
+                self,
+                "Dispositivo desvinculado",
+                "La vinculación se eliminó. El empleado puede iniciar sesión desde su nuevo teléfono.",
+            )
+        else:
+            QMessageBox.critical(
+                self,
+                "No se pudo desvincular",
+                "No se pudo liberar el teléfono. Actualiza la lista e inténtalo de nuevo.",
+            )
 
     def add_employee(self):
         current_roles = self._get_current_roles()

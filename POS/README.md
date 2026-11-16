@@ -26,3 +26,7 @@ No añadas a commits `firebase_credentials.json`, archivos `.env`, bases `.db`, 
 Usa POS/Iniciar-POS-Demo-Movil.cmd para iniciar el POS de demostracion con acceso desde la red local. Acepta el aviso de Windows Firewall en una red privada si aparece. El QR mostrara la IP LAN de esta computadora y la clave de demo. El telefono y la PC deben estar en la misma Wi-Fi.
 
 Iniciar-POS-Demo.cmd mantiene el servidor limitado a esta computadora; su QR de 127.0.0.1 no sirve para un telefono. Despues de iniciar el modo movil, abre el QR nuevo y vuelve a escanearlo en ControlAsistencia. No inicies ControlAsistencia/lib/server.py: el backend compatible es el servidor integrado del POS.
+
+## Cambiar el telefono de un empleado
+
+En Administracion > Empleados, selecciona al empleado que tiene un dispositivo vinculado y pulsa Desvincular dispositivo. Tras confirmar, el teléfono anterior deja de identificarse con esa cuenta; la próxima marcación desde el teléfono nuevo lo vincula al empleado seleccionado.
