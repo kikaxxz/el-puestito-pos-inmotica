@@ -163,8 +163,8 @@ class EmployeesTab(QWidget):
         layout.addLayout(controls_layout)
 
         self.employee_table = QTableWidget()
-        self.employee_table.setColumnCount(4) 
-        self.employee_table.setHorizontalHeaderLabels(["ID", "Nombre Completo", "Rol", "Dispositivo"]) 
+        self.employee_table.setColumnCount(4)
+        self.employee_table.setHorizontalHeaderLabels(["ID", "Nombre Completo", "Rol", "Dispositivo"])
         header = self.employee_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
