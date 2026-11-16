@@ -63,11 +63,19 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
     final prefs = await SharedPreferences.getInstance();
     final apiKey = uri.queryParameters['api_key'];
-    final serverUri = uri.replace(
-      queryParameters: {
-        for (final entry in uri.queryParameters.entries)
-          if (entry.key != 'api_key') entry.key: entry.value,
-      },
+    final remainingQuery = {
+      for (final entry in uri.queryParameters.entries)
+        if (entry.key != 'api_key') entry.key: entry.value,
+    };
+    // Construir una URI limpia evita conservar un '?' vacio al quitar api_key.
+    final serverUri = Uri(
+      scheme: uri.scheme,
+      userInfo: uri.userInfo.isEmpty ? null : uri.userInfo,
+      host: uri.host,
+      port: uri.hasPort ? uri.port : null,
+      path: uri.path,
+      queryParameters: remainingQuery.isEmpty ? null : remainingQuery,
+      fragment: uri.hasFragment ? uri.fragment : null,
     );
     await prefs.setString(
       'server_url',
