@@ -29,7 +29,8 @@ def setup_firewall():
         sys.exit()
 
 try:
-    if os.environ.get('PUESTITO_DEMO') != '1':
+    if (os.environ.get('PUESTITO_DEMO') != '1'
+            or os.environ.get('PUESTITO_DEMO_LAN') == '1'):
         setup_firewall()
     
     from PyQt6.QtWidgets import QApplication

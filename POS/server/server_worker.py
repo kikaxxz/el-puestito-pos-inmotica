@@ -25,7 +25,7 @@ class ServerWorker(QObject):
     def __init__(self):
         super().__init__()
         self.config = self._load_config()
-        self.API_KEY = self.config.get('api_key', 'DEMO-LOCAL-EL-PUESTITO-2026')
+        self.API_KEY = self.config.get('api_key', 'puestito_seguro_2025')
         
         self.PINS_WEB_MAP = {}
         self.cargar_pines_kds()
@@ -194,7 +194,12 @@ class ServerWorker(QObject):
         try:
             self.socketio.run(
                 self.app, 
-                host='127.0.0.1' if os.environ.get('PUESTITO_DEMO') == '1' else '0.0.0.0',
+                host=(
+                    '127.0.0.1'
+                    if os.environ.get('PUESTITO_DEMO') == '1'
+                    and os.environ.get('PUESTITO_DEMO_LAN') != '1'
+                    else '0.0.0.0'
+                ),
                 port=5000, 
                 log_output=True,
                 use_reloader=False,

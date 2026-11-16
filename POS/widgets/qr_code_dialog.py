@@ -23,9 +23,16 @@ class QRCodeDialog(QDialog):
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        local_demo = os.environ.get("PUESTITO_DEMO") == "1"
-        instruction_label = QLabel("Demostración local en esta computadora" if local_demo
-                                  else "Escanea este código desde la app del teléfono:")
+        local_demo = (
+            os.environ.get("PUESTITO_DEMO") == "1"
+            and os.environ.get("PUESTITO_DEMO_LAN") != "1"
+        )
+        instruction = (
+            "Demostración solo en esta computadora"
+            if local_demo
+            else "Escanea desde el teléfono conectado a la misma Wi-Fi:"
+        )
+        instruction_label = QLabel(instruction)
         instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         self.qr_label = QLabel()
@@ -42,7 +49,8 @@ class QRCodeDialog(QDialog):
         self.generate_and_display_qr()
 
     def get_local_ip(self):
-        if os.environ.get("PUESTITO_DEMO") == "1":
+        if (os.environ.get("PUESTITO_DEMO") == "1"
+                and os.environ.get("PUESTITO_DEMO_LAN") != "1"):
             return "127.0.0.1"
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:

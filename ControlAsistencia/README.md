@@ -17,7 +17,7 @@ El APK aparece en build/app/outputs/flutter-apk/app-release.apk.
 
 ## Vincular con El Puestito POS
 
-1. Inicia el POS actualizado en una computadora de la misma red Wi-Fi.
+1. En el repositorio, inicia POS/Iniciar-POS-Demo-Movil.cmd (o el POS normal) en una computadora de la misma red Wi-Fi. El launcher Demo normal limita el servidor a localhost y no sirve para un teléfono.
 2. Abre en el POS el QR de conexion.
 3. Instala y abre esta app en el telefono, pulsa el icono QR y escanea el codigo nuevo.
 4. Selecciona un empleado y registra asistencia.
